@@ -4,7 +4,7 @@ const express = require('express');
 const morgan = require('morgan');
 const createError = require('http-errors');
 const jsonParser = require('body-parser').json();
-const debug = require('debug')('joke:server'); //AHHHHHHH wutt
+const debug = require('debug')('joke:server'); //name of app, name of module
 
 const app = express();
 app.disable('x-powered-by'); //stupid
@@ -20,6 +20,14 @@ app.get('/test', function(req, res) {
   debug('GET: /test'); //leave the debug at the top of the route...
 
   res.json({'msg': 'test route!'});
+});
+
+app.post('/api/joke', jsonParser, function(req, res, next) { //'next' isn't strictly necessary.
+//callback is last function.
+//stuff in middle is... middleware
+  debug('POST: /api/note');
+  //TODO: build POST route
+
 });
 
 app.listen(PORT, () => { //called "lexical error function"
