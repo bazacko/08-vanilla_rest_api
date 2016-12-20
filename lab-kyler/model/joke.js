@@ -8,15 +8,34 @@ const storage = require('../lib/diskStorage.js');
 const Joke = module.exports = function(setup, punchline) {
   debug('joke constructor'); //just gives a name
 
-  if (!setup) throw new Error('expected a joke setup');
-  if (!punchline) throw new Error('expected a joke punchline');
+  if (!setup) throw createError(400, 'bad request');
+  if (!punchline) throw createError(400, 'bad request');
 
   this.id = uuid.v1();
   this.setup = setup;
   this.punchline = punchline;
+  return;
 };
 
 Joke.createJoke = function(_joke) { //we'll use 'joke' for something else - don't want a conflict
-  debug('createNote'); //just helps us know where the debug is coming from.
+  debug('createJoke'); //just helps us know where the debug is coming from.
 
-}//this is a static method - not attached to constructor - a prototype method would be on every instance.
+  try {
+    let joke = new Joke(_joke.setup, _joke.punchline);
+    return storage.storeItem('joke', joke);
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};//this is a static method - not attached to constructor - a prototype method would be on every instance.
+
+Joke.fetchJoke = function(id) {
+  debug('fetchJoke');
+
+  return storage.fetchItem('joke', id);
+};
+
+Joke.deleteJoke = function(id) {
+  debug('deleteJoke');
+
+  return storage.deleteItem('joke', id);
+};

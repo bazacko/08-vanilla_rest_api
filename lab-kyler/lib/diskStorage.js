@@ -2,28 +2,32 @@
 
 const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'), {suffix: 'Prom'});
+const createError = require('http-errors');
+const debug = require('debug')('joke:storage');
 
 module.exports = exports = {};
 
 exports.storeItem = (schema, item) => {
-  if (!schema) return Promise.reject(new Error('no schema'));
-  if (!item || !item.id) return Promise.reject(new Error('no item or item ID'));
+  debug('storeItem');
+  if (!schema) return Promise.reject(createError(400, 'expected schema'));
+  if (!item || !item.id) return Promise.reject(createError(400, 'expected item/item id'));
 
   return fs.writeFileProm(`${__dirname}/../data/${schema}/${item.id}.json`, JSON.stringify(item))
   .then( () => item)
-  .catch( err => Promise.reject(err));
+  .catch( err => Promise.reject(createError(500, err.message)));
 };
 
 exports.fetchItem = (schema, id) => {
-  if (!schema) return Promise.reject(new Error('no schema'));
+  if (!schema) return Promise.reject(createError(400, 'expected schema'));
+  if (!id) return exports.enumerate(schema); //get list
 
   return fs.readFileProm(`${__dirname}/../data/${schema}/${id}.json`)
   .then (data => JSON.parse(data.toString()))
-  .catch (err => Promise.reject(err));
+  .catch ( () => Promise.reject(createError(404, 'not found')));
 };
 
 exports.enumerate = (schema) => {
-  if (!schema) return Promise.reject(new Error('no schema'));
+  if (!schema) return Promise.reject(createError(400, 'expected schema'));
 
   return fs.readdirProm(`${__dirname}/../data/${schema}/`)
   .then( fileArray => {
@@ -36,8 +40,8 @@ exports.enumerate = (schema) => {
 };
 
 exports.deleteItem = (schema, id) => {
-  if (!schema) return Promise.reject(new Error('no schema received'));
-  if (!id) return Promise.reject(new Error('no item id received'));
+  if (!schema) return Promise.reject(createError(400, 'no schema'));
+  if (!id) return Promise.reject(createError(400, 'no id'));
 
   var path = `${__dirname}/../data/${schema}/${id}.json`;
   return fs.accessProm(path)

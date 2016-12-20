@@ -2,6 +2,7 @@
 
 const request = require('superagent');
 const expect = require('chai').expect;
+require('../server.js');
 
 //var testJoke = {setup: 'I just flew in from Chernobyl', punchline: 'and boy, are my arms legs!'};
 //var testJoke = {setup: 'Why did the console player cross the road?', punchline: 'To render the buildings on the other side.'};
@@ -11,7 +12,7 @@ var testJoke = {setup: 'Sting was kidnapped last night!', punchline: 'The Police
 describe('Route: /api/joke', function() {
 
   describe('GET-ing a nonexistent joke ID', function() {
-    it('should return status 404 and body "not found"', function (done) {
+    it('should respond with "not found" for valid requests made with an id that was not found', function (done) {
       request.get('localhost:2000/api/joke?id=abc123')
       .end( (err, res) => {
         if (err.status !== 404) done(err);
@@ -39,7 +40,7 @@ describe('Route: /api/joke', function() {
   });
 
   describe('GET-ing without a joke ID', function() {
-    it('should return status 200 and a list of joke IDs', function (done) {
+    it('should return status 200 and a list of joke IDs (extra credit)', function (done) {
       request.get('localhost:2000/api/joke')
       .end( (err, res) => {
         if (err) done(err);

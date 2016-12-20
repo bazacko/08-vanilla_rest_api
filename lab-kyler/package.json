@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "test": "gulp",
-    "debug2": "DEBUG='joke*' nodemon server.js"
+    "debug": "DEBUG='joke*' nodemon --ignore /data server.js"
   },
   "keywords": [],
   "author": "",
